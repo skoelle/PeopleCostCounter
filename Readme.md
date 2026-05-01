@@ -61,3 +61,45 @@ These numbers are consistent with the formula above.
 This tool is designed to make meeting costs visible, not to produce exact payroll accounting. In real companies, the true employer cost can vary by insurance rates, caps, bonuses, and other overhead, so the 1.2 factor should be understood as a simple approximation. [payrollgermany](https://payrollgermany.de/blog/employer-contributions-to-social-security-in-germany-a-comprehensive-guide/)
 
 The result is best used as a conversation starter: it helps teams notice how quickly meeting time turns into money.
+
+## Quick start
+
+To open the tracker locally you don't need a build step — just open one of the HTML files in a modern browser (Chrome, Edge, Firefox). For example:
+
+- Open `meeting-tracker-en.html` in a browser for the light-themed, feature-complete UI.
+- Open `meeting-tracker-de.html` for the german UI.
+
+If you prefer a live-reload development workflow, use an editor extension such as Live Server (VS Code) or any simple static file server.
+
+## Files of interest
+
+- `meeting-tracker-variant1.html` — first variant (dark mode, shows annual totals after start)
+- `meeting-tracker-variant2.html` — light-mode variant (no auto-start, shows annual / employer / total tiles)
+- `meeting-tracker-variant2-en.html` — English translation of variant 2
+- `meeting-tracker-variant3.html` — alternate UI experiments
+- `meeting-tracker-de.html` / `meeting-tracker-en.html` — other language variants
+- `meeting-cost-prompt.md` — internal prompt and notes used while developing the tracker
+
+## Browser & dependencies
+
+- No build tool or runtime dependencies. The pages use only vanilla HTML/CSS/JS.
+- A Google Fonts CDN is used for typography (Inter / JetBrains Mono); the pages work fine if fonts are blocked.
+
+## Example (quick test)
+
+- Developers: `8`
+- Avg. monthly: `5000`
+- Expected: annual per-dev = `60.000 €`, incl. employer ≈ `72.000 €`, total for 8 ≈ `576.000 €`, cost/sec ≈ `0.0909 €`, after 60s ≈ `5,45 €`.
+
+## Contributing
+
+- Prefer small, focused pull requests. Create a branch named `feature/...` or `fix/...` for changes.
+- If you want me to push changes, tell me whether to create a PR or commit directly to `main`.
+
+## License
+
+This repository does not yet include a LICENSE file. If you want a permissive license, I can add an `MIT` license file — tell me if that is acceptable or specify another license.
+
+## Author / Contact
+
+If you need changes, open an issue or contact the repository owner on GitHub.
