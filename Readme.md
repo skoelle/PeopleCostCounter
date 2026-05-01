@@ -10,9 +10,8 @@ It is intentionally simple: enter how many developers are present, enter the ave
 
 Open the tracker locally in a modern browser — no build step required. Recommended browsers: Chrome, Edge, Firefox.
 
-- `meeting-tracker-variant2.html` — light-mode variant with the full feature set (no auto-start).
-- `meeting-tracker-variant2-en.html` — English translation of variant 2.
-- `meeting-tracker-en.html` / `meeting-tracker-de.html` — other localized variants.
+- `meeting-tracker-en.html` — English UI (recommended)
+- `meeting-tracker-de.html` — German UI
 
 If you prefer a live-reload development workflow, use an editor extension such as Live Server (VS Code) or any simple static file server.
 
