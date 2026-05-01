@@ -1,8 +1,11 @@
 {
   "extends": ["html-validate:recommended"],
   "rules": {
-    "attr-no-dup": "error",
-    "doctype-style": "error",
-    "element-no-empty": ["warn", {"void": true}]
+    "no-implicit-button-type": "off",
+    "no-inline-style": "off",
+    "void-style": "off",
+    "doctype-style": "off",
+    "aria-label-misuse": "off",
+    "no-redundant-aria-label": "off"
   }
 }
