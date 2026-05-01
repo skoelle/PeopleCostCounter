@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Software-Entwickler Kostenzähler</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: Arial, Helvetica, sans-serif;
+      background: #f4f6f8;
+      color: #1f2937;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 900px;
+      background: #ffffff;
+      border-radius: 18px;
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08);
+      padding: 32px;
+    }
+
+    h1 {
+      margin: 0 0 8px;
+      font-size: 32px;
+      text-align: center;
+    }
+
+    .subtitle {
+      margin: 0 0 32px;
+      text-align: center;
+      color: #6b7280;
+      font-size: 16px;
+    }
+
+    .inputs {
+      display: grid;
+      grid-template-columns: 1fr 1fr auto;
+      gap: 16px;
+      align-items: end;
+      margin-bottom: 32px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 700;
+    }
+
+    input {
+      width: 100%;
+      padding: 14px 16px;
+      border: 1px solid #d1d5db;
+      border-radius: 12px;
+      font-size: 18px;
+    }
+
+    button {
+      padding: 15px 28px;
+      border: none;
+      border-radius: 12px;
+      background: #2563eb;
+      color: #ffffff;
+      font-size: 18px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background 0.2s ease;
+    }
+
+    button:hover {
+      background: #1d4ed8;
+    }
+
+    .counter-box {
+      background: #111827;
+      color: #ffffff;
+      border-radius: 18px;
+      padding: 36px 24px;
+      text-align: center;
+      margin-bottom: 24px;
+    }
+
+    .counter-label {
+      font-size: 18px;
+      color: #d1d5db;
+      margin-bottom: 12px;
+    }
+
+    .counter-value {
+      font-size: clamp(42px, 8vw, 84px);
+      font-weight: 800;
+      letter-spacing: -2px;
+    }
+
+    .metrics {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .metric {
+      background: #f9fafb;
+      border: 1px solid #e5e7eb;
+      border-radius: 14px;
+      padding: 18px;
+    }
+
+    .metric-title {
+      color: #6b7280;
+      font-size: 14px;
+      margin-bottom: 8px;
+    }
+
+    .metric-value {
+      font-size: 22px;
+      font-weight: 800;
+    }
+
+    .formula {
+      background: #f9fafb;
+      border-left: 5px solid #2563eb;
+      border-radius: 12px;
+      padding: 18px 20px;
+      color: #374151;
+      line-height: 1.6;
+      font-size: 15px;
+    }
+
+    .error {
+      display: none;
+      margin-bottom: 20px;
+      padding: 14px 16px;
+      border-radius: 12px;
+      background: #fee2e2;
+      color: #991b1b;
+      font-weight: 700;
+    }
+
+    @media (max-width: 760px) {
+      .inputs,
+      .metrics {
+        grid-template-columns: 1fr;
+      }
+
+      button {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="container">
+    <h1>Software-Entwickler Kostenzähler</h1>
+    <p class="subtitle">Live-Anzeige der laufenden Kosten während einer Besprechung oder Wartezeit.</p>
+
+    <section class="inputs">
+      <div>
+        <label for="softwareEntwicklerAnwesend">Software-Entwickler anwesend</label>
+        <input id="softwareEntwicklerAnwesend" type="number" min="0" step="1" value="1" />
+      </div>
+
+      <div>
+        <label for="durchschnittsgehalt">Durchschnittsgehalt pro Monat (€)</label>
+        <input id="durchschnittsgehalt" type="number" min="0" step="100" value="5000" />
+      </div>
+
+      <button id="startButton">Start</button>
+    </section>
+
+    <div id="error" class="error">Bitte gültige Werte größer als 0 eingeben.</div>
+
+    <section class="counter-box">
+      <div class="counter-label">Bisher verbraucht</div>
+      <div id="verbrauch" class="counter-value">0,00 €</div>
+    </section>
+
+    <section class="metrics">
+      <div class="metric">
+        <div class="metric-title">Kosten pro Sekunde</div>
+        <div id="kostenProSekunde" class="metric-value">0,00 €</div>
+      </div>
+      <div class="metric">
+        <div class="metric-title">Gesamtkosten pro Jahr</div>
+        <div id="gesamtkosten" class="metric-value">0,00 €</div>
+      </div>
+      <div class="metric">
+        <div class="metric-title">Laufzeit</div>
+        <div id="laufzeit" class="metric-value">0 s</div>
+      </div>
+    </section>
+
+    <section class="formula">
+      <strong>Berechnung:</strong><br />
+      Jahresgehalt = Durchschnittsgehalt × 12<br />
+      Jahresgehalt mit Arbeitgeberanteil = Jahresgehalt × 1,2<br />
+      Gesamtkosten = Jahresgehalt mit Arbeitgeberanteil × Software-Entwickler anwesend<br />
+      Kosten pro Sekunde = Gesamtkosten ÷ 365 Tage ÷ 8 Stunden ÷ 60 Minuten ÷ 60 Sekunden
+    </section>
+  </main>
+
+  <script>
+    const softwareEntwicklerInput = document.getElementById('softwareEntwicklerAnwesend');
+    const durchschnittsgehaltInput = document.getElementById('durchschnittsgehalt');
+    const startButton = document.getElementById('startButton');
+    const verbrauchElement = document.getElementById('verbrauch');
+    const kostenProSekundeElement = document.getElementById('kostenProSekunde');
+    const gesamtkostenElement = document.getElementById('gesamtkosten');
+    const laufzeitElement = document.getElementById('laufzeit');
+    const errorElement = document.getElementById('error');
+
+    let intervalId = null;
+    let startZeit = null;
+    let kostenProSekunde = 0;
+
+    const euroFormatter = new Intl.NumberFormat('de-DE', {
+      style: 'currency',
+      currency: 'EUR',
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
+    });
+
+    function berechneKosten() {
+      const softwareEntwicklerAnwesend = Number(softwareEntwicklerInput.value);
+      const durchschnittsgehalt = Number(durchschnittsgehaltInput.value);
+
+      if (softwareEntwicklerAnwesend <= 0 || durchschnittsgehalt <= 0) {
+        return null;
+      }
+
+      const jahresgehalt = durchschnittsgehalt * 12;
+      const jahresgehaltMitArbeitgeberanteil = jahresgehalt * 1.2;
+      const gesamtkosten = jahresgehaltMitArbeitgeberanteil * softwareEntwicklerAnwesend;
+      const kostenProSekunde = gesamtkosten / 365 / 8 / 60 / 60;
+
+      return {
+        gesamtkosten,
+        kostenProSekunde
+      };
+    }
+
+    function aktualisiereAnzeige() {
+      const jetzt = new Date();
+      const vergangeneSekunden = Math.floor((jetzt - startZeit) / 1000);
+      const verbrauch = vergangeneSekunden * kostenProSekunde;
+
+      verbrauchElement.textContent = euroFormatter.format(verbrauch);
+      laufzeitElement.textContent = `${vergangeneSekunden} s`;
+    }
+
+    startButton.addEventListener('click', () => {
+      const kosten = berechneKosten();
+
+      if (!kosten) {
+        errorElement.style.display = 'block';
+        return;
+      }
+
+      errorElement.style.display = 'none';
+
+      if (intervalId) {
+        clearInterval(intervalId);
+      }
+
+      kostenProSekunde = kosten.kostenProSekunde;
+      startZeit = new Date();
+
+      kostenProSekundeElement.textContent = euroFormatter.format(kostenProSekunde);
+      gesamtkostenElement.textContent = euroFormatter.format(kosten.gesamtkosten);
+      verbrauchElement.textContent = euroFormatter.format(0);
+      laufzeitElement.textContent = '0 s';
+
+      aktualisiereAnzeige();
+      intervalId = setInterval(aktualisiereAnzeige, 1000);
+    });
+  </script>
+</body>
+</html>

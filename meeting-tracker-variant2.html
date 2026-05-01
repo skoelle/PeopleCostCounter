@@ -1,0 +1,234 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Meeting Cost Tracker</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --bg:#0b0f14;
+      --panel:#0f1620;
+      --muted:#9aa6b2;
+      --accent:#00d4ff;
+      --danger:#ff6b6b;
+      --glass: rgba(255,255,255,0.03);
+    }
+    html,body{height:100%;}
+    body{
+      margin:0;padding:40px;box-sizing:border-box;
+      font-family:Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+      background:linear-gradient(180deg,#06070a 0%, #081018 60%); color:#e6eef6;
+      -webkit-font-smoothing:antialiased;
+    }
+    .wrap{max-width:1100px;margin:0 auto;display:grid;grid-template-columns:1fr;gap:28px}
+
+    .panel{background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01)); padding:22px;border-radius:12px;box-shadow:0 6px 30px rgba(0,0,0,0.6);}
+
+    .controls{display:flex;gap:18px;align-items:end;flex-wrap:wrap}
+    .field{display:flex;flex-direction:column;gap:6px}
+    label{font-size:13px;color:var(--muted)}
+    input[type=number]{
+      background:var(--panel);border:1px solid rgba(255,255,255,0.04);padding:10px 12px;border-radius:8px;color:inherit;font-size:16px;width:220px
+    }
+    .small{width:150px}
+    .row-actions{display:flex;gap:10px}
+    button{cursor:pointer;border:0;padding:10px 16px;border-radius:9px;font-weight:600}
+    button.start{background:linear-gradient(90deg,var(--accent),#6ee7b7);color:#042028}
+    button.start[disabled]{opacity:0.45;cursor:not-allowed}
+    button.reset{background:transparent;border:1px solid rgba(255,255,255,0.06);color:var(--muted)}
+
+    .big-display{display:flex;align-items:center;gap:20px;padding:28px;border-radius:12px}
+    .amount{font-weight:800;font-size:86px;line-height:1;color:#fff;letter-spacing:-2px}
+    .meta{display:flex;flex-direction:column;gap:8px}
+    .label{color:var(--muted);font-size:15px}
+    .per-sec{font-size:20px;color:var(--accent);font-weight:700}
+
+    .status{display:flex;align-items:center;gap:12px}
+    .pulse{width:14px;height:14px;border-radius:999px;background:#17343b;box-shadow:0 0 0 4px rgba(0,0,0,0.2);position:relative}
+    .pulse.active{background:var(--accent);box-shadow:0 0 20px rgba(0,212,255,0.18);}
+    .pulse.active::after{content:"";position:absolute;inset:0;border-radius:999px;animation:ping 1.2s infinite}
+    @keyframes ping{0%{transform:scale(1);opacity:0.9}50%{transform:scale(1.9);opacity:0.22}100%{transform:scale(2.6);opacity:0}}
+
+    .errors{color:var(--danger);font-size:13px;margin-top:6px}
+
+    /* layout for 1080p wide */
+    @media(min-width:900px){
+      .wrap{grid-template-columns:1fr}
+      .big-display{background:var(--glass);justify-content:space-between}
+      .meta{align-items:flex-end;text-align:right}
+    }
+
+    footer{color:var(--muted);font-size:13px;padding-top:8px}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="panel controls" style="align-items:flex-start">
+      <div class="field">
+        <label for="devs">Developers present</label>
+        <input id="devs" type="number" min="1" step="1" placeholder="Anzahl Entwickler" aria-label="Developers present">
+        <div id="devs-error" class="errors" aria-live="polite" style="display:none"></div>
+      </div>
+
+      <div class="field">
+        <label for="salary">Avg. monthly gross salary (€)</label>
+        <input id="salary" class="small" type="number" min="0.01" step="0.01" value="5000" aria-label="Avg monthly salary">
+        <div id="salary-error" class="errors" aria-live="polite" style="display:none"></div>
+      </div>
+
+      <div class="row-actions" style="margin-left:6px">
+        <button id="startBtn" class="start">Start</button>
+        <button id="resetBtn" class="reset">Reset</button>
+      </div>
+
+      <div style="flex:1"></div>
+
+      <div class="status" style="margin-top:6px">
+        <div id="dot" class="pulse" title="Counter status"></div>
+        <div style="color:var(--muted);font-size:13px">Counter status</div>
+      </div>
+    </div>
+
+    <div class="panel big-display">
+      <div>
+        <div class="label">Total cost so far</div>
+        <div id="total" class="amount">0,00 €</div>
+      </div>
+
+      <div class="meta">
+        <div class="label">Cost per second</div>
+        <div id="perSecond" class="per-sec">0,00 €</div>
+        <footer>Using 220 working days · employer contributions ×1.2</footer>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    (function(){
+      const devsInput = document.getElementById('devs');
+      const salaryInput = document.getElementById('salary');
+      const startBtn = document.getElementById('startBtn');
+      const resetBtn = document.getElementById('resetBtn');
+      const totalEl = document.getElementById('total');
+      const perSecEl = document.getElementById('perSecond');
+      const devsErr = document.getElementById('devs-error');
+      const salErr = document.getElementById('salary-error');
+      const dot = document.getElementById('dot');
+
+      const fmt = new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'EUR', minimumFractionDigits:2, maximumFractionDigits:2 });
+
+      const WORKING_SECONDS_PER_YEAR = 220 * 8 * 60 * 60; // 220 days * 8 hours * 3600 sec
+
+      let intervalId = null;
+      let accumulated = 0;
+      let costPerSecond = 0;
+
+      function parseInputs(){
+        const devsRaw = devsInput.value.trim();
+        const salaryRaw = salaryInput.value.trim();
+        const devs = devsRaw === '' ? NaN : Number(devsRaw);
+        const salary = salaryRaw === '' ? NaN : Number(salaryRaw);
+        return {devs, salary};
+      }
+
+      function validateBeforeStart(){
+        const {devs, salary} = parseInputs();
+        let ok = true;
+        devsErr.style.display = 'none'; salErr.style.display = 'none';
+        if (!Number.isInteger(devs) || devs < 1){
+          devsErr.textContent = 'Please enter a whole number ≥ 1'; devsErr.style.display = 'block'; ok=false;
+        }
+        if (!(typeof salary === 'number') || Number.isNaN(salary) || salary <= 0){
+          salErr.textContent = 'Monthly salary must be > 0'; salErr.style.display = 'block'; ok=false;
+        }
+        return ok;
+      }
+
+      function recalc(){
+        const {devs, salary} = parseInputs();
+        // Clear inline errors while editing
+        devsErr.style.display = 'none'; salErr.style.display = 'none';
+
+        if (!Number.isFinite(devs) || !Number.isFinite(salary) || devs <= 0 || salary <= 0){
+          costPerSecond = 0;
+          perSecEl.textContent = fmt.format(0);
+          return;
+        }
+        const annual = salary * 12;
+        const withContrib = annual * 1.2;
+        const totalAnnual = withContrib * devs;
+        costPerSecond = totalAnnual / WORKING_SECONDS_PER_YEAR;
+        perSecEl.textContent = fmt.format(costPerSecond);
+      }
+
+      function tick(){
+        // add current costPerSecond (which may have changed) and update display
+        accumulated += costPerSecond;
+        totalEl.textContent = fmt.format(accumulated);
+      }
+
+      function start(){
+        if (intervalId) return;
+        if (!validateBeforeStart()) return;
+        // ensure latest calc applied
+        recalc();
+        intervalId = setInterval(tick, 1000);
+        startBtn.disabled = true;
+        dot.classList.add('active');
+        // update UI immediately (don't wait 1s for first tick)
+        totalEl.textContent = fmt.format(accumulated);
+      }
+
+      function reset(){
+        if (intervalId){
+          clearInterval(intervalId); intervalId = null;
+        }
+        accumulated = 0;
+        totalEl.textContent = fmt.format(0);
+        startBtn.disabled = false;
+        dot.classList.remove('active');
+      }
+
+      // wire events
+      startBtn.addEventListener('click', start);
+      resetBtn.addEventListener('click', reset);
+
+      devsInput.addEventListener('input', function(){
+        // If user types non-integer, show a gentle inline message but don't block running counter
+        const v = devsInput.value.trim();
+        if (v === ''){
+          devsErr.textContent = 'Required'; devsErr.style.display='block';
+        } else if (!Number.isInteger(Number(v)) || Number(v) < 1){
+          devsErr.textContent = 'Must be a whole number ≥ 1'; devsErr.style.display='block';
+        } else {
+          devsErr.style.display='none';
+        }
+        recalc();
+      });
+
+      salaryInput.addEventListener('input', function(){
+        const v = salaryInput.value.trim();
+        if (v === '' || Number(v) <= 0){
+          salErr.textContent = 'Must be > 0'; salErr.style.display='block';
+        } else {
+          salErr.style.display='none';
+        }
+        recalc();
+      });
+
+      // initialize displays
+      perSecEl.textContent = fmt.format(0);
+      totalEl.textContent = fmt.format(0);
+
+      // compute initial per-second using prefilled salary (devs empty so stays 0)
+      recalc();
+
+      // Keyboard: allow Enter on salary or devs to start
+      [devsInput, salaryInput].forEach(el=>{
+        el.addEventListener('keydown', (e)=>{ if(e.key === 'Enter'){ start(); } });
+      });
+    })();
+  </script>
+</body>
+</html>
