@@ -25,10 +25,14 @@ If you prefer a live-reload development workflow, use an editor extension such a
 
 ## Files of interest
 
-- `meeting-tracker-variant1.html` — first variant (dark mode, shows annual totals after start)
-- `meeting-tracker-variant2.html` — light-mode variant (recommended)
-- `meeting-tracker-variant2-en.html` — English translation of variant 2
-- `meeting-tracker-variant3.html` — alternate UI experiments
+- `meeting-tracker-de.html` / `meeting-tracker-en.html` — canonical builds (German / English)
+
+Experimental variants (moved to `variants/`):
+
+- `variants/meeting-tracker-variant1.html`
+- `variants/meeting-tracker-variant2.html`
+- `variants/meeting-tracker-variant3.html`
+
 - `meeting-cost-prompt.md` — internal prompt and notes used while developing the tracker
 
 ## Browser & dependencies
