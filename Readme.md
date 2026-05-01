@@ -8,10 +8,12 @@ It is intentionally simple: enter how many developers are present, enter the ave
 
 ## Quick start
 
-Open the tracker locally in a modern browser — no build step required. Recommended browsers: Chrome, Edge, Firefox.
+Open the tracker in your browser. The project is published via GitHub Pages — live demo URLs:
 
-- `meeting-tracker-en.html` — English UI (recommended)
-- `meeting-tracker-de.html` — German UI
+- English UI: https://skoelle.github.io/PeopleCostCounter/meeting-tracker-en.html
+- German UI:  https://skoelle.github.io/PeopleCostCounter/meeting-tracker-de.html
+
+You can also open the local HTML files directly in a browser (no build step required). Recommended browsers: Chrome, Edge, Firefox.
 
 If you prefer a live-reload development workflow, use an editor extension such as Live Server (VS Code) or any simple static file server.
 
