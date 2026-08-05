@@ -22,8 +22,7 @@ PeopleCostCounter/
 ├── LICENSE                          # MIT License
 ├── README.md                        # User-facing documentation
 ├── package.json                     # Dev tooling config (html-validate only)
-├── .htmlvalidate.json               # HTML validation rules
-├── .htmlvalidate.json               # HTML validation config
+├── .htmlvalidate.json               # HTML validation config/rules
 ├── screenshot.png                   # Promotional screenshot
 ├── meeting-cost-prompt.md           # Original development prompt / notes
 ├── meeting-tracker-de.html          # Canonical build — German UI
