@@ -84,8 +84,5 @@ The result is best used as a conversation starter: it helps teams notice how qui
 
 ## License
 
-This repository does not yet include a LICENSE file. If you want a permissive license, I can add an `MIT` license file — tell me if that is acceptable or specify another license.
+Licensed under the [MIT License](LICENSE) - Copyright (c) 2026 Stefan Koelle (https://stefankoelle.de)
 
-## Author / Contact
-
-If you need changes, open an issue or contact the repository owner on GitHub.
