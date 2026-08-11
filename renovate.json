@@ -2,26 +2,11 @@
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": ["config:recommended"],
   "schedule": ["before 6am on Monday"],
-  "customManagers": [
-    {
-      "customType": "regex",
-      "fileMatch": ["\\.github/workflows/[^.]+\\.ya?ml$"],
-      "matchStrings": ["node-version:\\s*['\"]?(?<currentValue>\\d+)['\"]?"],
-      "datasourceTemplate": "docker",
-      "depNameTemplate": "node"
-    }
-  ],
   "packageRules": [
     {
       "matchManagers": ["github-actions"],
       "groupName": "GitHub Actions",
       "automerge": true
-    },
-    {
-      "matchDatasources": ["docker"],
-      "matchDepNames": ["node"],
-      "groupName": "Node.js",
-      "automerge": false
     },
     {
       "matchManagers": ["dockerfile"],
