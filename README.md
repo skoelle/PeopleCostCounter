@@ -33,8 +33,6 @@ Experimental variants (moved to `variants/`):
 - `variants/meeting-tracker-variant2.html`
 - `variants/meeting-tracker-variant3.html`
 
-- `meeting-cost-prompt.md` — internal prompt and notes used while developing the tracker
-
 ## Browser & dependencies
 
 - No build tool or runtime dependencies. The pages use only vanilla HTML/CSS/JS.
