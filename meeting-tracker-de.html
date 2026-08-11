@@ -210,7 +210,7 @@ function getParams(){
   var annualWithEmployer=annualSalary*1.2;
   var totalCost=annualWithEmployer*devCount;
   var costPerSecond=totalCost/220/8/60/60;
-  return{devCount:devCount,avgSalary:avgSalary,totalCost:totalCost,costPerSecond:costPerSecond};
+  return{devCount:devCount,avgSalary:avgSalary,annualSalary:annualSalary,annualWithEmployer:annualWithEmployer,totalCost:totalCost,costPerSecond:costPerSecond};
 }
 function tick(){
   var elapsed=pausedElapsed+(Date.now()-startTime)/1000;
@@ -222,10 +222,9 @@ function tick(){
   document.getElementById('tilePerMin').textContent='EUR '+fmt(p.costPerSecond*60);
   document.getElementById('tilePerHour').textContent='EUR '+fmt(p.costPerSecond*3600);
   document.getElementById('tileTotal').textContent=p.devCount+' x EUR '+fmt(p.avgSalary);
-  // show annual / employer / total year values (as integers)
-  var annual = p.annualSalary || p.avgSalary*12;
-  var employer = p.annualWithEmployer || annual*1.2;
-  var annualTotal = p.totalCost || employer * p.devCount;
+  var annual = p.annualSalary;
+  var employer = p.annualWithEmployer;
+  var annualTotal = p.totalCost;
   document.getElementById('tileAnnual').textContent = annual.toLocaleString('de-DE',{minimumFractionDigits:0,maximumFractionDigits:0}) + ' €';
   document.getElementById('tileEmployer').textContent = employer.toLocaleString('de-DE',{minimumFractionDigits:0,maximumFractionDigits:0}) + ' €';
   document.getElementById('tileAnnualTotal').textContent = annualTotal.toLocaleString('de-DE',{minimumFractionDigits:0,maximumFractionDigits:0}) + ' €';
@@ -269,6 +268,10 @@ function resetTimer(){
   document.getElementById('devCount').disabled=false;
   document.getElementById('avgSalary').disabled=false;
 }
+
+// input listeners: update per-second display when editing
+document.getElementById('devCount').addEventListener('input', function(){ if(!isRunning){ var p=getParams(); if(p.costPerSecond>0) document.getElementById('tilePerSec').textContent='EUR '+p.costPerSecond.toLocaleString('de-DE',{minimumFractionDigits:4,maximumFractionDigits:4}); }});
+document.getElementById('avgSalary').addEventListener('input', function(){ if(!isRunning){ var p=getParams(); if(p.costPerSecond>0) document.getElementById('tilePerSec').textContent='EUR '+p.costPerSecond.toLocaleString('de-DE',{minimumFractionDigits:4,maximumFractionDigits:4}); }});
 
 // No auto-start: user must press Start. (Previously auto-started here.)
 </script>
